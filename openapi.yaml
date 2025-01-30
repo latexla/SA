@@ -1,0 +1,82 @@
+openapi: 3.0.0
+info:
+  title: Блокировка и разблокировка платежей клиентов
+  version: 1.0.0
+servers:
+  - url: https://api.t-bank.com/v1
+paths:
+  /clients/{clientId}/block:
+    post:
+      summary: Заблокировать клиента
+      operationId: blockClient
+      tags:
+        - Clients
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  enum: [mismatching_details, fraud_suspected]
+                  description: Причина блокировки (мошенник/обычный клиент)
+      responses:
+        '200':
+          description: Клиент успешно заблокирован
+        '400':
+          description: Некорректный запрос
+
+  /clients/{clientId}/unblock:
+    post:
+      summary: Разблокировать клиента
+      operationId: unblockClient
+      tags:
+        - Clients
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Клиент успешно разблокирован
+        '400':
+          description: Некорректный запрос
+  
+  /clients/{clientId}/status:
+    get:
+      summary: Проверка статуса блокировки клиента
+      operationId: checkBlockStatus
+      tags:
+        - Clients
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Статус блокировки клиента
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  blocked:
+                    type: boolean
+                    description: Является ли клиент заблокированным
+                  reason:
+                    type: string
+                    enum: [mismatching_details, fraud_suspected]
+                    description: Причина блокировки (мошенник/обычный клиент)
+        '400':
+          description: Некорректный запрос
